@@ -1,4 +1,106 @@
-# Couturize Backend (Django)
+# Couturize Backend (Django) | Бэкенд Couturize (Django)
+
+## 🇷🇺 Русский
+
+### О проекте
+Бэкенд часть приложения Couturize, разработанная с использованием Django и Django REST Framework.
+
+### Требования
+- Python 3.8 или выше
+- pip (менеджер пакетов Python)
+- virtualenv или venv
+
+### Установка и запуск
+1. Создайте виртуальное окружение:
+```bash
+python -m venv venv
+```
+
+2. Активируйте виртуальное окружение:
+```bash
+# Windows
+venv\Scripts\activate
+# Linux/MacOS
+source venv/bin/activate
+```
+
+3. Установите зависимости:
+```bash
+pip install -r requirements.txt
+```
+
+4. Примените миграции:
+```bash
+python manage.py migrate
+```
+
+5. Запустите сервер разработки:
+```bash
+python manage.py runserver
+```
+
+### Структура проекта
+- `authentication/` - Приложение аутентификации
+- `api/` - API endpoints
+- `models/` - Модели данных
+- `services/` - Бизнес-логика
+- `utils/` - Вспомогательные функции
+- `tests/` - Тесты
+
+### API Документация
+Подробная документация API доступна в файле [API_DOCUMENTATION.md](./API_DOCUMENTATION.md).
+
+---
+
+## 🇬🇧 English
+
+### About
+The backend part of the Couturize application, developed using Django and Django REST Framework.
+
+### Requirements
+- Python 3.8 or higher
+- pip (Python package manager)
+- virtualenv or venv
+
+### Installation and Running
+1. Create a virtual environment:
+```bash
+python -m venv venv
+```
+
+2. Activate the virtual environment:
+```bash
+# Windows
+venv\Scripts\activate
+# Linux/MacOS
+source venv/bin/activate
+```
+
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+4. Apply migrations:
+```bash
+python manage.py migrate
+```
+
+5. Run development server:
+```bash
+python manage.py runserver
+```
+
+### Project Structure
+- `authentication/` - Authentication application
+- `api/` - API endpoints
+- `models/` - Data models
+- `services/` - Business logic
+- `utils/` - Helper functions
+- `tests/` - Tests
+
+### API Documentation
+Detailed API documentation is available in [API_DOCUMENTATION.md](./API_DOCUMENTATION.md).
 
 ## Project Setup
 
