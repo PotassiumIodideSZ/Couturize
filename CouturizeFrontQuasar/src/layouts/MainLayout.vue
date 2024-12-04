@@ -1,12 +1,13 @@
 <template>
-  <q-layout view="lHh lpr lFf" class="main-bg-color">
+  <q-layout view="hHh lpR fFf" class="main-bg-color">
     <HeaderMain @toggle-right-drawer="toggleRightDrawer" />
 
     <q-drawer
       v-model="rightDrawerOpen"
-      show-if-above
       side="right"
       :class="$q.dark.isActive ? 'drawer-dark' : 'drawer-light'"
+      bordered
+      fixed
     >
       <q-list>
         <q-item-label header class="drawer-header">
@@ -54,14 +55,19 @@ const linksList = [
     link: '/style'
   },
   {
-    title: 'Просто кнопка',
-    caption: '',
-    link: '/button'
-  },
-  {
     title: 'Личный кабинет',
     caption: '',
     link: '/account'
+  },
+  {
+    title: 'Вход',
+    caption: '',
+    link: '/login'
+  },
+  {
+    title: 'Регистрация',
+    caption: '',
+    link: '/register'
   }
 ]
 
@@ -75,14 +81,8 @@ function toggleRightDrawer() {
 <style lang="scss">
 /* Using global styles to override Quasar's classes */
 .q-drawer {
-  &.drawer-light {
-    background: var(--bg-color) !important;
-    color: var(--text-color) !important;
-    border-left: 2px solid var(--highlight-color);
-  }
-
-  &.drawer-dark {
-    background: var(--bg-color) !important;
+  &.drawer-light, &.drawer-dark {
+    background: var(--color-primary-bg) !important;
     color: var(--text-color) !important;
     border-left: 2px solid var(--highlight-color);
   }
@@ -116,5 +116,10 @@ function toggleRightDrawer() {
     color: var(--highlight-color) !important;
     font-family: var(--font-family) !important;
   }
+}
+
+.main-bg-color {
+  background: var(--bg-color) !important;
+  color: var(--text-color) !important;
 }
 </style>

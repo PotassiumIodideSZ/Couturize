@@ -5,6 +5,7 @@
   --spacing-sm: 1.25rem;
   --spacing-md: 2.5rem;
   --transition-duration: 0.3s;
+  --color-primary-bg: #{$primary-bg};
   --color-dark: #{$dark};
   --font-family: 'Kanit', sans-serif;
   --space-sm: 1.25rem;
@@ -16,14 +17,12 @@
   --text-color: var(--color-dark);
   --bg-color: #ffffff;
   --highlight-color: #{$primary};
-  --section-bg: #f5f5f5;
 }
 
 .body--dark {
   --text-color: #ffffff;
-  --bg-color: var(--color-dark);
+  --bg-color: var(--color-primary-bg);
   --highlight-color: #{$primary};
-  --section-bg: #1d1d1d;
 }
 
 .banner-section {
@@ -69,7 +68,6 @@
   align-items: center;
   margin: 2.5rem 0;
   padding: 2rem;
-  background: var(--section-bg);
 
   &-text {
     width: 50%;

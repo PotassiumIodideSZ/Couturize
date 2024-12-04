@@ -7,11 +7,53 @@
   padding: 0;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap');
+
+/* Builder Extended Font Family */
+@font-face {
+  font-family: 'Builder Extended';
+  src: url('../assets/fonts/BuilderExtended-Light-300_0.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Builder Extended';
+  src: url('../assets/fonts/BuilderExtended-Regular-400_0.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Builder Extended';
+  src: url('../assets/fonts/BuilderExtended-SemiBold-600_0.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Builder Extended';
+  src: url('../assets/fonts/BuilderExtended-Bold-700_0.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Builder Extended';
+  src: url('../assets/fonts/BuilderExtended-ExtraBold-800_0.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
 
 /* Base variables */
 :root {
-  --font-family: 'Kanit', sans-serif;
+  --font-family: 'Raleway', sans-serif;
+  --font-family-logo: 'Builder Extended', sans-serif;
   --transition-duration: 0.3s;
   --color-primary: #{$primary};
   --color-primary-bg: #{$primary-bg};
@@ -45,7 +87,7 @@
 
 /* Light theme (default) */
 :root {
-  --text-color: #000000;
+  --text-color: #{$primary-bg};
   --bg-color: #ffffff;
   --highlight-color: #{$primary};
   --drawer-bg: #f0f0f0;  /* Light theme drawer background */
@@ -54,10 +96,9 @@
 /* Dark theme */
 .body--dark {
   --text-color: #ffffff;
-  --bg-color: #{$dark};
-  --section-bg: #1d1d1d;
+  --bg-color: #{$primary-bg};
   --highlight-color: #{$primary};
-  --drawer-bg: #151515;  /* Darker drawer background for dark theme */
+  --drawer-bg: #{$primary-bg};  /* Darker drawer background for dark theme */
 
   background: var(--bg-color);
 

@@ -14,7 +14,15 @@
         <img class="image-2" src="../assets/image 5.jpg" alt="Image 2" />
         <img class="image-3" src="../assets/image 6.jpg" alt="Image 3" />
       </div>
-
+      <image-carousel-main
+        title="КАРУСЕЛЬКА"
+        :images="carouselImages"
+        :visible-count="3"
+        :image-ratio="1.33"
+        :base-width="300"
+        :center-scale="1.1"
+        @slide-change="onSlideChange"
+      />
       <div class="section">
         <div class="flex-section">
           <p class="flex-section-text"><span class="highlight">ПОДБОР</span> ЦВЕТОВОЙ ПАЛИТРЫ И <span class="highlight">РЕКОМЕНДАЦИИ</span> ПО ФАСОНАМ И СТИЛЯМ ОДЕЖДЫ</p>
@@ -35,13 +43,26 @@
 
 <script setup>
 import { useQuasar } from 'quasar'
-import { onMounted, watch } from 'vue'
+import { onMounted, watch, ref } from 'vue'
 
+import ImageCarouselMain from 'components/ImageCarouselMain.vue'
 defineOptions({
   name: 'IndexPage'
 });
 
 const $q = useQuasar()
+
+const carouselImages = ref([
+  { src: new URL('../assets/pngExample1.png', import.meta.url).href, alt: 'Style Example 1' },
+  { src: new URL('../assets/pngExample2.png', import.meta.url).href, alt: 'Style Example 2' },
+  { src: new URL('../assets/pngExample3.png', import.meta.url).href, alt: 'Style Example 3' },
+  { src: new URL('../assets/pngExample4.png', import.meta.url).href, alt: 'Style Example 4' },
+  { src: new URL('../assets/pngExample5.png', import.meta.url).href, alt: 'Style Example 5' }
+])
+
+const onSlideChange = (index) => {
+  console.log('Current slide:', index)
+}
 
 // Initialize dark mode based on system preference
 onMounted(() => {
@@ -60,5 +81,9 @@ watch(() => $q.dark.isActive, val => {
 :deep(.q-page) {
   background: var(--q-primary-bg);
   transition: background-color 0.3s ease;
+}
+
+.banner-section{
+  margin-top: -81px !important;
 }
 </style>
