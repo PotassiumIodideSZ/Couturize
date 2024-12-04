@@ -25,3 +25,5 @@ Couturize is an innovative fashion application that combines technology and styl
 Detailed instructions for installation and running can be found in the README.md files in the respective directories:
 - [Frontend (Quasar)](./CouturizeFrontQuasar/README.md)
 - [Backend (Django)](./CouturizeBackDjango/README.md)
+
+### Installation and Running
