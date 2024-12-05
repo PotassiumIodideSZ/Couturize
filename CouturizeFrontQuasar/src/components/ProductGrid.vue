@@ -124,6 +124,7 @@ export default {
 }
 
 .product-price {
+  font-family: 'Inter';
   color: black;
   font-size: 1.5rem;
   font-weight: 500;

@@ -8,6 +8,7 @@
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* Builder Extended Font Family */
 @font-face {
@@ -53,6 +54,7 @@
 /* Base variables */
 :root {
   --font-family: 'Raleway', sans-serif;
+  --font-family-price: 'Inter', sans-serif;
   --font-family-logo: 'Builder Extended', sans-serif;
   --transition-duration: 0.3s;
   --color-primary: #{$primary};
