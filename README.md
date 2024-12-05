@@ -13,7 +13,7 @@ Couturize - это инновационное приложение для мод
 
 ## Технологии
 
-- **Frontend:**
+- **Frontend:** Quasar
 - **Backend:** Django
 
 
