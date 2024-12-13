@@ -11,11 +11,19 @@
         flat
         dense
         round
+        icon="person"
+        class=""
+      />
+
+      <q-btn
+        flat
+        dense
+        round
         :icon="$q.dark.isActive ? 'light_mode' : 'dark_mode'"
         @click="toggleDarkMode"
         class="q-mr-sm theme-toggle"
       />
-      
+
       <q-btn
         flat
         dense
@@ -23,7 +31,7 @@
         aria-label="Menu"
         @click="toggleMenu"
         class="menu-btn"
-        :class="{ 'is-open': isMenuOpen }"
+        :class="{ 'is-open': rightDrawerOpen }"
       >
         <div class="hamburger-icon">
           <span class="line line-1"></span>
@@ -36,7 +44,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, inject } from 'vue'
 import { useQuasar } from 'quasar'
 
 defineOptions({
@@ -44,18 +52,17 @@ defineOptions({
 })
 
 const $q = useQuasar()
-const isMenuOpen = ref(false)
+const rightDrawerOpen = inject('rightDrawerOpen')
 
 const toggleDarkMode = () => {
   $q.dark.toggle()
 }
 
+const emit = defineEmits(['toggle-right-drawer'])
+
 const toggleMenu = () => {
-  isMenuOpen.value = !isMenuOpen.value
   emit('toggle-right-drawer')
 }
-
-const emit = defineEmits(['toggle-right-drawer'])
 </script>
 
 <style lang="scss" scoped>
@@ -86,7 +93,7 @@ const emit = defineEmits(['toggle-right-drawer'])
     font-family: 'Builder Extended' !important;
     font-weight: 600 !important;
     letter-spacing: 2px;
-    
+
     &:hover {
       color: var(--highlight-color);
     }
@@ -104,7 +111,7 @@ const emit = defineEmits(['toggle-right-drawer'])
 
 .menu-btn {
   padding: 8px;
-  
+
   .hamburger-icon {
     width: 24px;
     height: 18px;
@@ -170,5 +177,4 @@ const emit = defineEmits(['toggle-right-drawer'])
     font-size: 36px;
   }
 }
-
 </style>

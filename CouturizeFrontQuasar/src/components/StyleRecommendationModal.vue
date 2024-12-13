@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-model="isOpen" persistent>
+  <q-dialog v-model="isOpen" persistent maximized>
     <q-card class="recommendation-modal">
       <div class="modal-header">
         <div class="text-h5">Создание новой рекомендации</div>
@@ -64,71 +64,112 @@
   </q-dialog>
 </template>
 
-<script setup>
-import { ref, computed } from 'vue'
+<script>
+import { defineComponent } from 'vue'
+import { checkAuthAndRedirect } from '../utils/auth'
 
-const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false
+export default defineComponent({
+  name: 'StyleRecommendationModal',
+  props: {
+    modelValue: {
+      type: Boolean,
+      default: false
+    }
+  },
+  emits: ['update:modelValue', 'submit'],
+  data() {
+    return {
+      redirectPath: '/',
+      season: null,
+      style: null,
+      price: 0,
+      description: ''
+    }
+  },
+  computed: {
+    isOpen: {
+      get() {
+        if (this.modelValue) {
+          if (!checkAuthAndRedirect(this.redirectPath)) {
+            this.$emit('update:modelValue', false)
+            return false
+          }
+        }
+        return this.modelValue
+      },
+      set(value) {
+        this.$emit('update:modelValue', value)
+      }
+    },
+    isFormValid() {
+      return this.season && this.style && this.price > 0
+    }
+  },
+  watch: {
+    season() { this.checkAuthAndClose() },
+    style() { this.checkAuthAndClose() },
+    price() { this.checkAuthAndClose() },
+    description() { this.checkAuthAndClose() }
+  },
+  methods: {
+    checkAuthAndClose() {
+      if (this.modelValue && !checkAuthAndRedirect(this.redirectPath)) {
+        this.$emit('update:modelValue', false)
+      }
+    },
+    formatPrice(value) {
+      return value ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₽' : '0 ₽'
+    },
+    closeModal() {
+      this.$emit('update:modelValue', false)
+      this.season = null
+      this.style = null
+      this.price = 0
+      this.description = ''
+    },
+    onSubmit() {
+      if (!checkAuthAndRedirect(this.redirectPath)) return
+
+      this.$emit('submit', {
+        season: this.season,
+        style: this.style,
+        price: this.price,
+        description: this.description
+      })
+      this.closeModal()
+    }
+  },
+  beforeMount() {
+    if (this.modelValue && !checkAuthAndRedirect(this.redirectPath)) {
+      this.$emit('update:modelValue', false)
+    }
   }
 })
-
-const emit = defineEmits(['update:modelValue', 'submit'])
-
-const isOpen = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
-})
-
-const season = ref(null)
-const style = ref(null)
-const price = ref(0)
-
-const isFormValid = computed(() => {
-  return season.value && style.value && price.value > 0
-})
-
-const formatPrice = (value) => {
-  return new Intl.NumberFormat('ru-RU').format(value)
-}
-
-const closeModal = () => {
-  isOpen.value = false
-}
-
-const onSubmit = () => {
-  emit('submit', {
-    season: season.value,
-    style: style.value,
-    price: price.value
-  })
-  closeModal()
-}
 </script>
 
 <style lang="scss" scoped>
 .recommendation-modal {
-  width: 100%;
-  max-width: 600px;
-  background: var(--dark-page);
-}
+  width: 90%;
+  max-width: 800px;
+  margin: auto;
+  border-radius: 8px;
+  background: var(--color-primary-bg);
+  color: var(--text-color);
 
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-:deep(.q-slider) {
-  &__selection {
-    background: var(--q-primary);
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid var(--highlight-color);
   }
-  
-  &__thumb {
-    background: var(--q-primary);
+
+  :deep(.q-slider__selection) {
+    background: var(--highlight-color);
+  }
+
+  :deep(.q-slider__thumb) {
+    color: var(--highlight-color);
   }
 }
 </style>

@@ -1,56 +1,57 @@
 <template>
   <q-page class="flex flex-center">
-    <AuthCard title="Вход">
+    <div class="login-container">
+      <h2 class="text-h4 text-center q-mb-lg">Вход</h2>
       <q-form @submit="onSubmit" class="q-gutter-md">
         <q-input
-          v-model="email"
-          label="Email"
-          type="email"
+          v-model="username"
+          label="Имя пользователя"
+          :rules="[val => !!val || 'Обязательное поле']"
+          :error="!!fieldErrors.username"
+          :error-message="fieldErrors.username"
           outlined
-          :rules="[val => !!val || 'Email обязателен',
-                  val => /.+@.+\..+/.test(val) || 'Введите корректный email']"
         />
 
         <q-input
           v-model="password"
           label="Пароль"
-          :type="isPwd ? 'password' : 'text'"
+          type="password"
+          :rules="[val => !!val || 'Обязательное поле']"
+          :error="!!fieldErrors.password"
+          :error-message="fieldErrors.password"
           outlined
-          :rules="[val => !!val || 'Пароль обязателен',
-                  val => val.length >= 6 || 'Минимум 6 символов']"
-        >
-          <template v-slot:append>
-            <q-icon
-              :name="isPwd ? 'visibility_off' : 'visibility'"
-              class="cursor-pointer"
-              @click="isPwd = !isPwd"
-            />
-          </template>
-        </q-input>
+        />
 
-        <div class="full-width q-pt-md">
+        <div class="row justify-between items-center q-mt-md">
+          <q-checkbox v-model="rememberMe" label="Запомнить меня" />
+          <q-btn flat color="primary" label="Забыли пароль?" to="/reset-password" />
+        </div>
+
+        <div class="row justify-center q-mt-lg">
           <q-btn
-            label="Войти"
             type="submit"
             color="primary"
+            label="Войти"
             class="full-width"
+            :loading="loading"
           />
         </div>
+
+        <SocialAuthButtons
+          class="q-mt-md"
+          action="войти"
+          @google-click="loginWithGoogle"
+          @vk-click="loginWithVK"
+        />
+
+        <div class="row justify-center q-mt-md">
+          <p class="text-grey-7">
+            Нет аккаунта?
+            <router-link to="/register" class="text-primary">Зарегистрироваться</router-link>
+          </p>
+        </div>
       </q-form>
-
-      <SocialAuthButtons
-        action="войти"
-        @google-click="loginWithGoogle"
-        @vk-click="loginWithVK"
-      />
-
-      <div class="text-center q-pt-md">
-        Нет аккаунта?
-        <router-link to="/register" class="text-primary">
-          Зарегистрироваться
-        </router-link>
-      </div>
-    </AuthCard>
+    </div>
   </q-page>
 </template>
 
@@ -58,55 +59,104 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
-import AuthCard from 'components/AuthCard.vue'
+import { handleSuccessfulLogin } from '../utils/auth'
 import SocialAuthButtons from 'components/SocialAuthButtons.vue'
 
-const router = useRouter()
 const $q = useQuasar()
+const router = useRouter()
 
-const email = ref('')
+const username = ref('')
 const password = ref('')
-const isPwd = ref(true)
+const rememberMe = ref(false)
+const loading = ref(false)
+const fieldErrors = ref({})
 
 const loginWithGoogle = () => {
   $q.notify({
-    message: 'Функция входа через Google будет добавлена позже',
-    color: 'info'
+    type: 'info',
+    message: 'Функция входа через Google будет добавлена позже'
   })
 }
 
 const loginWithVK = () => {
   $q.notify({
-    message: 'Функция входа через VK будет добавлена позже',
-    color: 'info'
+    type: 'info',
+    message: 'Функция входа через VK будет добавлена позже'
   })
 }
 
-const onSubmit = () => {
-  // Here will be login logic
-  $q.notify({
-    message: 'Функция входа будет добавлена позже',
-    color: 'info'
-  })
+const onSubmit = async () => {
+  try {
+    loading.value = true
+    fieldErrors.value = {}
+
+    const response = await fetch('http://localhost:8000/api/auth/login/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: username.value,
+        password: password.value,
+      }),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      // Handle field-specific errors and non-field errors
+      Object.entries(data).forEach(([field, errors]) => {
+        if (field === 'detail' || field === 'non_field_errors') {
+          fieldErrors.value.password = errors
+        } else {
+          if (Array.isArray(errors)) {
+            fieldErrors.value[field] = errors.join(', ')
+          } else {
+            fieldErrors.value[field] = errors
+          }
+        }
+      })
+      return
+    }
+
+    // Store refresh token if remember me is checked
+    if (rememberMe.value) {
+      localStorage.setItem('refresh_token', data.refresh)
+    }
+
+    // Handle successful login and redirect
+    handleSuccessfulLogin(data.access)
+  } catch (error) {
+    fieldErrors.value.password = 'Произошла ошибка при входе'
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
 <style lang="scss" scoped>
-.login-card {
+.login-container {
   width: 100%;
   max-width: 400px;
-  padding: 20px;
-  border: 2px solid var(--q-primary);
+  padding: 2rem;
+}
 
-  &.q-card--dark {
-    border-color: var(--q-primary);
-    box-shadow: 0 1px 5px rgba(var(--q-primary), 0.2),
-                0 2px 2px rgba(var(--q-primary), 0.14),
-                0 3px 1px -2px rgba(var(--q-primary), 0.12);
+.q-form {
+  width: 100%;
+}
+
+a {
+  text-decoration: none;
+  font-weight: 500;
+  
+  &:hover {
+    text-decoration: underline;
   }
 }
 
-.social-btn {
-  width: 140px;
+.text-negative {
+  color: #C10015;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
 }
 </style>

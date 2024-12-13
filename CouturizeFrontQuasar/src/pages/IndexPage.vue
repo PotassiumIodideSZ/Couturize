@@ -23,6 +23,15 @@
         :center-scale="1.1"
         @slide-change="onSlideChange"
       />
+      <div class="text-center q-mt-lg">
+        <q-btn
+          class="style-btn"
+          color="primary"
+          size="lg"
+          label="ПОДОБРАТЬ СТИЛЬ"
+          @click="openStyleModal"
+        />
+      </div>
       <div class="section">
         <div class="flex-section">
           <p class="flex-section-text"><span class="highlight">ПОДБОР</span> ЦВЕТОВОЙ ПАЛИТРЫ И <span class="highlight">РЕКОМЕНДАЦИИ</span> ПО ФАСОНАМ И СТИЛЯМ ОДЕЖДЫ</p>
@@ -43,7 +52,8 @@
 
 <script setup>
 import { useQuasar } from 'quasar'
-import { onMounted, watch, ref } from 'vue'
+import { onMounted, watch, ref, inject } from 'vue'
+import { useRouter } from 'vue-router'
 
 import ImageCarouselMain from 'components/ImageCarouselMain.vue'
 defineOptions({
@@ -51,6 +61,8 @@ defineOptions({
 });
 
 const $q = useQuasar()
+const router = useRouter()
+const openStyleModal = inject('openStyleModal')
 
 const carouselImages = ref([
   { src: new URL('../assets/pngExample1.png', import.meta.url).href, alt: 'Style Example 1' },
@@ -85,5 +97,20 @@ watch(() => $q.dark.isActive, val => {
 
 .banner-section{
   margin-top: -81px !important;
+}
+
+.style-btn {
+  font-family: var(--font-family);
+  font-size: 1.2rem;
+  padding: 12px 32px;
+  background: var(--highlight-color);
+  color: var(--text-color);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
 }
 </style>
