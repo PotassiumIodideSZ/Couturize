@@ -1,17 +1,18 @@
 <template>
-  <q-dialog v-model="isOpen" persistent maximized>
+  <q-dialog v-model="isOpen" persistent>
     <q-card class="recommendation-modal">
-      <div class="modal-header">
-        <div class="text-h5">Создание новой рекомендации</div>
-        <q-btn flat round icon="close" @click="closeModal" />
-      </div>
+      <q-card-section class="row items-center q-pb-none">
+        <div class="text-h6">Создание новой рекомендации</div>
+        <q-space />
+        <q-btn icon="close" flat round dense v-close-popup />
+      </q-card-section>
 
-      <q-card-section>
+      <q-card-section class="q-pt-md">
         <div class="row q-col-gutter-md">
           <!-- Сезон -->
-          <div class="col-12 col-sm-6">
-            <div class="text-subtitle1 q-mb-sm">Выберите сезон:</div>
-            <div class="q-gutter-y-sm">
+          <div class="col-12">
+            <div class="text-h6 q-mb-sm">Выберите сезон:</div>
+            <div class="row q-gutter-sm">
               <q-radio v-model="season" val="winter" label="Зима" />
               <q-radio v-model="season" val="spring" label="Весна" />
               <q-radio v-model="season" val="summer" label="Лето" />
@@ -20,34 +21,30 @@
           </div>
 
           <!-- Стиль -->
-          <div class="col-12 col-sm-6">
-            <div class="text-subtitle1 q-mb-sm">Выберите стиль:</div>
-            <div class="q-gutter-y-sm">
-              <q-radio v-model="style" val="business" label="Деловой" />
-              <q-radio v-model="style" val="sport" label="Спортивный" />
-              <q-radio v-model="style" val="casual" label="Кэжуал" />
-              <q-radio v-model="style" val="underwear" label="Бельевой" />
-              <q-radio v-model="style" val="outerwear" label="Верхняя одежда" />
+          <div class="col-12">
+            <div class="text-h6 q-mb-sm">Выберите стиль:</div>
+            <div class="row q-gutter-sm">
+              <q-radio v-model="selectedStyle" val="business" label="Деловой" />
+              <q-radio v-model="selectedStyle" val="sport" label="Спортивный" />
+              <q-radio v-model="selectedStyle" val="casual" label="Кэжуал" />
+              <q-radio v-model="selectedStyle" val="underwear" label="Бельевой" />
+              <q-radio v-model="selectedStyle" val="outerwear" label="Верхняя одежда" />
             </div>
           </div>
-        </div>
 
-        <!-- Стоимость -->
-        <div class="q-mt-lg">
-          <div class="text-subtitle1 q-mb-sm">Стоимость, руб</div>
-          <q-slider
-            v-model="price"
-            :min="0"
-            :max="1000000"
-            :step="1000"
-            label
-            label-always
-            color="primary"
-          >
-            <template v-slot:thumb-label>
-              {{ formatPrice(price) }}
-            </template>
-          </q-slider>
+          <!-- Стоимость -->
+          <div class="col-12">
+            <div class="text-h6 q-mb-sm">Стоимость, руб</div>
+            <q-slider
+              v-model="price"
+              :min="0"
+              :max="1000000"
+              label
+              label-always
+              :label-value="formatPrice(price)"
+              color="primary"
+            />
+          </div>
         </div>
       </q-card-section>
 
@@ -56,8 +53,8 @@
           label="ДАЛЕЕ"
           color="primary"
           class="full-width"
-          :disable="!isFormValid"
           @click="onSubmit"
+          :loading="loading"
         />
       </q-card-actions>
     </q-card>
@@ -65,25 +62,28 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue'
+import { ref, computed } from 'vue'
 import { checkAuthAndRedirect } from '../utils/auth'
+import api from '../utils/axios'
 
-export default defineComponent({
+export default {
   name: 'StyleRecommendationModal',
   props: {
-    modelValue: {
-      type: Boolean,
-      default: false
-    }
+    modelValue: Boolean,
+    imageUrl: String,
+    occasion: String,
+    style: String,
+    budget: String
   },
   emits: ['update:modelValue', 'submit'],
   data() {
     return {
       redirectPath: '/',
       season: null,
-      style: null,
+      selectedStyle: null,
       price: 0,
-      description: ''
+      loading: false,
+      error: null
     }
   },
   computed: {
@@ -94,22 +94,14 @@ export default defineComponent({
             this.$emit('update:modelValue', false)
             return false
           }
+          return true
         }
-        return this.modelValue
+        return false
       },
       set(value) {
         this.$emit('update:modelValue', value)
       }
-    },
-    isFormValid() {
-      return this.season && this.style && this.price > 0
     }
-  },
-  watch: {
-    season() { this.checkAuthAndClose() },
-    style() { this.checkAuthAndClose() },
-    price() { this.checkAuthAndClose() },
-    description() { this.checkAuthAndClose() }
   },
   methods: {
     checkAuthAndClose() {
@@ -117,25 +109,34 @@ export default defineComponent({
         this.$emit('update:modelValue', false)
       }
     },
-    formatPrice(value) {
-      return value ? value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₽' : '0 ₽'
-    },
     closeModal() {
       this.$emit('update:modelValue', false)
+    },
+    resetForm() {
       this.season = null
-      this.style = null
+      this.selectedStyle = null
       this.price = 0
-      this.description = ''
+    },
+    formatPrice(value) {
+      return new Intl.NumberFormat('ru-RU').format(value)
     },
     onSubmit() {
       if (!checkAuthAndRedirect(this.redirectPath)) return
+      if (!this.season || !this.selectedStyle) {
+        this.$q.notify({
+          color: 'negative',
+          message: 'Пожалуйста, заполните все обязательные поля',
+          position: 'top'
+        })
+        return
+      }
 
       this.$emit('submit', {
         season: this.season,
-        style: this.style,
-        price: this.price,
-        description: this.description
+        style: this.selectedStyle,
+        price: this.price
       })
+      this.resetForm()
       this.closeModal()
     }
   },
@@ -144,32 +145,52 @@ export default defineComponent({
       this.$emit('update:modelValue', false)
     }
   }
-})
+}
 </script>
 
 <style lang="scss" scoped>
 .recommendation-modal {
-  width: 90%;
-  max-width: 800px;
-  margin: auto;
-  border-radius: 8px;
-  background: var(--color-primary-bg);
-  color: var(--text-color);
+  min-width: 400px;
+  padding: 1rem;
+  background: #333333;
+  color: white;
+}
 
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px;
-    border-bottom: 1px solid var(--highlight-color);
+:deep(.q-radio) {
+  .q-radio__inner {
+    color: white;
   }
-
-  :deep(.q-slider__selection) {
-    background: var(--highlight-color);
+  .q-radio__label {
+    color: white;
   }
+}
 
-  :deep(.q-slider__thumb) {
-    color: var(--highlight-color);
+:deep(.q-slider) {
+  .q-slider__track-container {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  .q-slider__pin-value-marker-text {
+    font-size: 12px;
+  }
+}
+
+.text-h6 {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.q-btn {
+  &.full-width {
+    background: #FF5733;
+    color: white;
+    font-weight: 500;
+    border-radius: 8px;
+    height: 48px;
+
+    &:hover {
+      background: darken(#FF5733, 10%);
+    }
   }
 }
 </style>
