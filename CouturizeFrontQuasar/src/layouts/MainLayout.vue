@@ -8,6 +8,7 @@
       :class="$q.dark.isActive ? 'drawer-dark' : 'drawer-light'"
       bordered
       fixed
+      @hide="onDrawerHide"
     >
       <q-list>
         <q-item-label header class="drawer-header">
@@ -19,6 +20,7 @@
           :key="link.title"
           v-bind="link"
           :active="$route.path === link.link"
+          @click="handleLinkClick(link)"
         />
       </q-list>
     </q-drawer>
@@ -27,21 +29,27 @@
       <router-view />
     </q-page-container>
     <FooterMain />
+    <StyleRecommendationModal
+      v-model="showStyleModal"
+      @submit="handleStyleSubmit"
+    />
   </q-layout>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, computed, provide } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import EssentialLink from 'components/EssentialLink.vue'
 import FooterMain from 'components/FooterMain.vue'
 import HeaderMain from 'components/HeaderMain.vue'
+import StyleRecommendationModal from 'components/StyleRecommendationModal.vue'
 
 defineOptions({
   name: 'MainLayout',
 })
 
 const route = useRoute()
+const router = useRouter()
 
 const linksList = [
   {
@@ -51,13 +59,12 @@ const linksList = [
   },
   {
     title: 'Подобрать стиль',
-    caption: '',
-    link: '/style'
+    caption: ''
   },
   {
     title: 'Личный кабинет',
     caption: '',
-    link: '/account'
+    link: '/profile'
   },
   {
     title: 'Вход',
@@ -72,9 +79,37 @@ const linksList = [
 ]
 
 const rightDrawerOpen = ref(false)
+const showStyleModal = ref(false)
 
 function toggleRightDrawer() {
   rightDrawerOpen.value = !rightDrawerOpen.value
+}
+
+provide('rightDrawerOpen', rightDrawerOpen)
+
+const openStyleModal = () => {
+  showStyleModal.value = true
+}
+
+provide('openStyleModal', openStyleModal)
+
+const handleLinkClick = (link) => {
+  if (link.title === 'Подобрать стиль') {
+    openStyleModal()
+    rightDrawerOpen.value = false
+  } else {
+    router.push(link.link)
+    rightDrawerOpen.value = false
+  }
+}
+
+const handleStyleSubmit = (formData) => {
+  showStyleModal.value = false
+  router.push('/style')
+}
+
+const onDrawerHide = () => {
+  rightDrawerOpen.value = false
 }
 </script>
 
